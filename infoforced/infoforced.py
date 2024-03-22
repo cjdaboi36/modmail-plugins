@@ -35,13 +35,6 @@ class Foo(commands.Cog):
         embed.add_field(name="Hosting Method", value="`WANTUH`")
 
 
-        if self.bot.version.is_prerelease:
-            stable = next(filter(lambda v: not Version(v.version).is_prerelease, changelog.versions))
-            footer = f"You are on the prerelease version • the latest version is v{stable.version}."
-        elif self.bot.version < Version(latest.version):
-            footer = f"A newer version is available v{latest.version}."
-        else:
-            footer = "You are up to date with the latest version."
 
         embed.add_field(
             name="Wantuh's Hosting Service",
