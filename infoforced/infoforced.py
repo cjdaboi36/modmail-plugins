@@ -51,14 +51,12 @@ class Foo(commands.Cog):
 
         )
 
+        footer = "Wantuh's Hosting Service"
         embed.set_footer(text=footer)
         await ctx.send(embed=embed)
 
-
 async def setup(bot):
     result = bot.remove_command("about")
-
     if result is None:
-        logger.error("failed to remove 'about' command, something has probably gone wrong")
-
+        logger.error("Failed to remove 'about' command. Something has probably gone wrong.")
     await bot.add_cog(Foo(bot))
