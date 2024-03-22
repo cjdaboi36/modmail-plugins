@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from core import checks, utils
 from core.models import PermissionLevel, getLogger
