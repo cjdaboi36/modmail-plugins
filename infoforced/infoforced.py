@@ -34,8 +34,6 @@ class Foo(commands.Cog):
         embed.add_field(name="Authors", value="`kyb3r`, `Taki`, `fourjr`")
         embed.add_field(name="Hosting Method", value="`WANTUH`")
 
-        changelog = await Changelog.from_url(self.bot)
-        latest = changelog.latest_version
 
         if self.bot.version.is_prerelease:
             stable = next(filter(lambda v: not Version(v.version).is_prerelease, changelog.versions))
