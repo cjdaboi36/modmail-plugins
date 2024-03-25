@@ -6,7 +6,7 @@ from core.models import PermissionLevel, getLogger
 logger = getLogger(__name__)
 
 
-class Wantuh(commands.Cog):
+class Foo(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
