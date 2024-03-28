@@ -20,7 +20,6 @@ class Foo(commands.Cog):
         embed.set_author(
             name="Modmail - Information",
             icon_url=self.bot.user.display_avatar.url,
-            url="https://discord.gg/F34cRU8",
         )
         embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 
