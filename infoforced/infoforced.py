@@ -38,7 +38,7 @@ class Foo(commands.Cog):
         embed.add_field(
             name="Wantuh's Hosting Service",
             value=f"Wantuh's Hosting Service is a service ran by <@561312593155981323>, if you wish "
-            "to have a Modmail bot of your own please contact him. Join https://discord.gg/Xyrb2j8FP2 or Email helpdesk@wantuh.com for any support or questions.",
+            "to have a Modmail bot of your own please contact him. Join https://discord.gg/SQSHbShamS or Email helpdesk@wantuh.com for any support or questions.",
             inline=False,
         )
 
