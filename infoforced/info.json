@@ -1,10 +1,10 @@
 {
-    "name": "Wantuh",
+    "name": "CjsCommisions",
     "description": [
-        "Hosted by Wantuh",
+        "Hosted By Cj's Commisions",
         "\n**Version:**\n`{0}`"
     ],
-    "authors": ["wantuh"],
+    "authors": ["Cj"],
     "version": "1.0.0",
     "bot_version": "4.0.0",
     "dpy_version": "2.0.0"
