@@ -31,26 +31,17 @@ class Foo(commands.Cog):
         embed.add_field(name="Latency", value=f"{self.bot.latency * 1000:.2f} ms")
         embed.add_field(name="Version", value=f"`{self.bot.version}`")
         embed.add_field(name="Authors", value="`kyb3r`, `Taki`, `fourjr`")
-        embed.add_field(name="Hosting Method", value="`WANTUH`")
+        embed.add_field(name="Hosting Method", value="`CJSCOMMISIONS`")
 
 
 
         embed.add_field(
-            name="Wantuh's Hosting Service",
-            value=f"Wantuh's Hosting Service is a service ran by <@561312593155981323>, if you wish "
-            "to have a Modmail bot of your own please contact him. Join https://discord.gg/SQSHbShamS or Email helpdesk@wantuh.com for any support or questions.",
-            inline=False,
-        )
-
-        embed.add_field(
-            name="Modmail",
-            value="Open source bot on [GitHub](https://github.com/khakers/OpenModmail/tree/oldstable), stable version "
-            "by <@184473972446986240> (khakers)",
+            name="Cj's Commisions Modmail Hosting",
+            value=f"Cj's Commisions Modmail Hosting"
+            "To get a modmail bot hosted by us join https://discord.gg/F9yPkvcTzY.",
             inline=False,
 
-        )
-
-        footer = "Wantuh's Hosting Service"
+        footer = "Cj's Commisions Hosting Service"
         embed.set_footer(text=footer)
         await ctx.send(embed=embed)
 
