@@ -15,7 +15,7 @@ class CheckRole(commands.Cog):
         # Initialize MongoDB connection
         mongo_uri = os.getenv("MONGO_URI")
         self.client = MongoClient(mongo_uri)
-        self.db = self.client["modmail"]  # Replace "modmail" with your database name if different
+        self.db = self.client["modmail_bot"]  # Replace "modmail" with your database name if different
         self.role_collection = self.db["roles"]
 
     @commands.Cog.listener()
