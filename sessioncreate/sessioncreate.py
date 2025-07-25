@@ -28,7 +28,7 @@ class LogSession(commands.Cog):
         # Send an initial message to show the bot is processing
         processing_message = await ctx.send("Generating a new log upload session, please wait...")
 
-        api_endpoint = 'http://localhost:6560/api/logs/generate' # Your CDN server endpoint
+        api_endpoint = 'https://cdn.avionicsrblx.com/api/logs/generate' # Your CDN server endpoint
 
         try:
             async with aiohttp.ClientSession() as session:
