@@ -26,6 +26,13 @@ class LogSession(commands.Cog):
             # Staff-facing error, no need to relay to user
             return await ctx.send("Error: CDN API Key is not configured for this command. Please contact the bot administrator.")
 
+        # --- IMPORTANT: Get the Modmail Ticket object ---
+        # This is the correct way to send messages "into" the ticket.
+        ticket = self.bot.get_ticket(ctx.channel.id) 
+        if not ticket:
+            return await ctx.send("This command can only be used in a Modmail ticket channel.")
+        # -------------------------------------------------
+
         # Send an initial message to the staff channel to show the bot is processing
         # This message is not relayed to the user.
         processing_message = await ctx.send("Generating a new log upload session, please wait...")
@@ -62,23 +69,11 @@ class LogSession(commands.Cog):
                         view_link = data.get('viewLink')
                         session_id = data.get('sessionId', 'N/A')
 
-                        # Construct the message content for the Modmail reply command
+                        # Construct the message content for the Modmail reply via the ticket object
+                        # This message WILL be relayed to the user's DM.
                         upload_message_content = f"Here is your upload link: {upload_link}"
-
-                        # Get the Modmail 'reply' command
-                        reply_command = self.bot.get_command('reply')
-                        if reply_command:
-                            # --- CRITICAL FIX HERE: Pass message as positional argument ---
-                            await ctx.invoke(reply_command, upload_message_content)
-                            # -----------------------------------------------------------
-                            
-                        else:
-                            await ctx.send("Error: Could not find Modmail's 'reply' command. Please check bot configuration.")
-                            # Fallback: if reply command isn't found, send directly to channel
-                            # This will NOT relay to the user's DM.
-                            await ctx.send(f"Here is your upload link: {upload_link} (Not relayed to user as Modmail reply command was not found.)")
-
-
+                        await ticket.reply(upload_message_content)
+                        
                         # Create and send the embed for the staff view link.
                         # This embed is for staff eyes only and is NOT relayed to the user's DM.
                         view_embed = discord.Embed(
