@@ -41,8 +41,12 @@ class LogSession(commands.Cog):
                         'Content-Type': 'application/json'
                     }
                 ) as response:
-                    # Delete the "processing" message after we get a response
-                    await processing_message.delete()
+                    # --- Robust deletion for processing_message ---
+                    try:
+                        await processing_message.delete()
+                    except discord.NotFound:
+                        print("Warning: Processing message already deleted or not found.")
+                    # ---------------------------------------------
 
                     if response.status != 200:
                         error_data = await response.json(content_type=None) # Handle potential non-JSON errors
@@ -59,28 +63,20 @@ class LogSession(commands.Cog):
                         session_id = data.get('sessionId', 'N/A')
 
                         # Construct the message content for the Modmail reply command
-                        # This message will be relayed to the user's DM
                         upload_message_content = f"Here is your upload link: {upload_link}"
 
-                        # Get the Modmail 'reply' command and invoke it
-                        # This makes the bot send the message as if a staff member typed '[prefix]reply ...'
+                        # Get the Modmail 'reply' command
                         reply_command = self.bot.get_command('reply')
                         if reply_command:
-                            # We need to create a dummy message to attach the reply to,
-                            # or some Modmail bots can directly pass message content.
-                            # Assuming basic `reply` command takes a string argument.
-                            # Note: OpenModmail's reply command can be tricky to invoke directly as it expects a message context.
-                            # A common workaround is to manually call the `_reply_to_user` function if exposed,
-                            # or create a temporary message. For simplicity, we'll try invoking directly.
-                            
-                            # The 'reply' command in OpenModmail typically expects a string after the command.
-                            # ctx.invoke allows calling a command's function directly.
-                            await ctx.invoke(reply_command, message=upload_message_content)
+                            # --- CRITICAL FIX HERE: Pass message as positional argument ---
+                            await ctx.invoke(reply_command, upload_message_content)
+                            # -----------------------------------------------------------
                             
                         else:
                             await ctx.send("Error: Could not find Modmail's 'reply' command. Please check bot configuration.")
-                            # Fallback if reply command isn't found, send directly to channel
-                            # await ctx.send(f"Here is your upload link: {upload_link} (Not relayed to user)")
+                            # Fallback: if reply command isn't found, send directly to channel
+                            # This will NOT relay to the user's DM.
+                            await ctx.send(f"Here is your upload link: {upload_link} (Not relayed to user as Modmail reply command was not found.)")
 
 
                         # Create and send the embed for the staff view link.
@@ -105,14 +101,20 @@ class LogSession(commands.Cog):
                         await ctx.send(f"Failed to create session: {data.get('error', 'Unknown error from server.')}") # Staff-facing error
 
         except aiohttp.ClientError as e:
-            # Ensure processing message is deleted even on network errors
-            if processing_message and processing_message.id: # Check if message exists to delete
+            # --- Robust deletion for processing_message in error handling ---
+            try:
                 await processing_message.delete()
+            except discord.NotFound:
+                pass # Already handled or not found, proceed with error message
+            # --------------------------------------------------------------
             await ctx.send(f"Network error communicating with CDN server: `{e}`. Please ensure the server is running.") # Staff-facing error
         except Exception as e:
-            # Ensure processing message is deleted even on other errors
-            if processing_message and processing_message.id:
+            # --- Robust deletion for processing_message in error handling ---
+            try:
                 await processing_message.delete()
+            except discord.NotFound:
+                pass # Already handled or not found, proceed with error message
+            # --------------------------------------------------------------
             await ctx.send(f"An unexpected error occurred: `{e}`. Please check bot logs.") # Staff-facing error
             print(f"Unexpected error in create_session_command: {e}")
 
