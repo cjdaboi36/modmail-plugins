@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 import aiohttp
 import os
-from types import SimpleNamespace # Import SimpleNamespace to create a dummy message object
+# from types import SimpleNamespace # No longer strictly needed if using DummyMessage
+from core.thread import Thread # Import the Thread class
+from core.models import DummyMessage # <--- IMPORTANT: Import DummyMessage
 
 class LogSession(commands.Cog):
     def __init__(self, bot):
@@ -27,10 +29,14 @@ class LogSession(commands.Cog):
             # Staff-facing error, no need to relay to user
             return await ctx.send("Error: CDN API Key is not configured for this command. Please contact the bot administrator.")
 
-        # --- CORRECTED LINE HERE: Access thread manager for the ticket object ---
-        ticket = self.bot.threads.get_thread(ctx.channel.id) 
-        if not ticket:
-            return await ctx.send("This command can only be used in a Modmail ticket channel.")
+        # --- CRITICAL FIX: Use Thread.from_channel to get the ticket object ---
+        try:
+            ticket = await Thread.from_channel(self.bot.threads, ctx.channel)
+        except ValueError: # from_channel can raise ValueError if topic is malformed etc.
+            return await ctx.send("This command can only be used in a valid Modmail ticket channel.")
+        
+        if not ticket: # Although from_channel should always return a Thread if successful, this is a good safety check
+            return await ctx.send("Could not retrieve ticket information from this channel.")
         # ---------------------------------------------------------------------
 
         # Send an initial message to the staff channel to show the bot is processing
@@ -74,13 +80,21 @@ class LogSession(commands.Cog):
                         message_to_send_to_user = f"Here is your upload link: {upload_link}"
 
                         # --- Create a DummyMessage object for the ticket.reply() method ---
-                        dummy_message = SimpleNamespace(
-                            content=message_to_send_to_user,
-                            author=ctx.author, # The author of the command (staff)
-                            attachments=[],
-                            embeds=[]
-                        )
-                        await ticket.reply(dummy_message)
+                        dummy_message = DummyMessage() # Instantiate DummyMessage
+                        dummy_message.content = message_to_send_to_user
+                        dummy_message.author = ctx.author # The author of the command (staff)
+                        dummy_message.attachments = []
+                        dummy_message.embeds = []
+                        dummy_message.components = [] # Explicitly clear
+                        dummy_message.stickers = []   # Explicitly clear
+
+                        # Call ticket.reply - this sends the message to the user's DM and staff channel
+                        staff_msgs, user_msgs = await ticket.reply(dummy_message)
+
+                        if user_msgs:
+                            print(f"Successfully sent log session link to user's DM: {user_msgs[0].id}")
+                        else:
+                            print("Warning: User message not found in ticket.reply response. Check Modmail settings.")
                         # ----------------------------------------------------------------
 
                         # Create and send the embed for the staff view link.
