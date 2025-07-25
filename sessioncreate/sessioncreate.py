@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 import aiohttp
 import os
-# from types import SimpleNamespace # No longer strictly needed if using DummyMessage
 from core.thread import Thread 
 from core.models import DummyMessage # IMPORTANT: Import DummyMessage
 
@@ -77,7 +76,7 @@ class LogSession(commands.Cog):
 
                         # Construct the message content for the Modmail reply via the ticket object
                         # This message WILL be relayed to the user's DM.
-                        message_to_send_to_user = f"Here is your upload link: {upload_link}"
+                        message_to_send_to_user = f"> <:avionicsserverlogo:1384211042300858500> **Console Log Upload Link** \n\n Please click the link attached below to upload your Roblox Console Logs. \n\n **Link:** {upload_link}"
 
                         # --- Create a DummyMessage object for the ticket.reply() method ---
                         # Pass ctx.message as the base message, then set/clear attributes
@@ -92,10 +91,11 @@ class LogSession(commands.Cog):
                         # Call ticket.reply - this sends the message to the user's DM and staff channel
                         staff_msgs, user_msgs = await ticket.reply(dummy_message)
 
-                        if user_msgs:
+                        # --- Added robust check for user_msgs for logging ---
+                        if isinstance(user_msgs, list) and user_msgs:
                             print(f"Successfully sent log session link to user's DM: {user_msgs[0].id}")
                         else:
-                            print("Warning: User message not found in ticket.reply response. Check Modmail settings.")
+                            print("Warning: User message not found or not a list in ticket.reply response. Check Modmail settings.")
                         # ----------------------------------------------------------------
 
                         # Create and send the embed for the staff view link.
