@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import datetime
 import json
 import math
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import discord
-from bson import json_util
 from discord.ext import commands
 
 from core import checks
@@ -26,11 +26,33 @@ logger = getLogger(__name__)
 
 API_BASE = "https://bots.wantuh.com"
 MIGRATE_ENDPOINT = API_BASE + "/api/migrate/plugin"
-CHUNK_SIZE = 2000
+CHUNK_SIZE = 2000 
+
+
+def _make_serializable(obj: Any) -> Any:
+    """
+    Recursively convert BSON/pymongo types to plain JSON-serializable Python objects.
+    Handles ObjectId, datetime, Decimal128, Int64, and bytes without importing bson directly.
+    """
+    type_name = type(obj).__name__
+    if type_name in ("ObjectId", "Decimal128", "Int64", "Int32", "Timestamp"):
+        return str(obj)
+    if isinstance(obj, datetime.datetime):
+        return obj.isoformat()
+    if isinstance(obj, datetime.date):
+        return obj.isoformat()
+    if isinstance(obj, bytes):
+        return obj.hex()
+    if isinstance(obj, dict):
+        return {k: _make_serializable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [_make_serializable(v) for v in obj]
+    return obj
+
 
 def _serialize(docs: list) -> list:
-    """Convert BSON documents (ObjectId, datetime, etc.) to JSON-safe dicts."""
-    return json.loads(json_util.dumps(docs))
+    """Convert a list of BSON documents to JSON-safe plain Python dicts."""
+    return [_make_serializable(doc) for doc in docs]
 
 
 class Migrate(commands.Cog, name=__plugin_name__):
