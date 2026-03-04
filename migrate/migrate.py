@@ -26,7 +26,7 @@ logger = getLogger(__name__)
 
 API_BASE = "https://bots.wantuh.com"
 MIGRATE_ENDPOINT = API_BASE + "/api/migrate/plugin"
-CHUNK_SIZE = 2000 
+CHUNK_SIZE = 2000
 
 
 def _make_serializable(obj: Any) -> Any:
@@ -106,7 +106,7 @@ class Migrate(commands.Cog, name=__plugin_name__):
             return body
 
 
-    @commands.command(name="migrate")
+    @commands.command(name="dbmigrate")
     @checks.has_permissions(PermissionLevel.ADMINISTRATOR)
     async def migrate(self, ctx: commands.Context, token: str):
         """
