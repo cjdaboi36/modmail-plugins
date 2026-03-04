@@ -1,0 +1,12 @@
+{
+    "name": "Migrate",
+    "description": [
+        "Migration plugin.",
+        "\nExports all MongoDB collections from this bot's database and pushes them to the Wantuh Modmail dashboard via the migration API."
+    ],
+    "author": "wantuh",
+    "version": "1.0.0",
+    "bot_version": "4.0.2",
+    "dpy_version": "2.2.3",
+    "requirements": []
+}
